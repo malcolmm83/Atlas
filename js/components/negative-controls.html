@@ -1,0 +1,190 @@
+<div data-bind="if: $component.conceptSetValid()">
+    <div class="loading" data-bind="if:$component.loadingEvidenceSources()">loading</div>
+    <div data-bind="if: !$component.loadingEvidenceSources()">
+        <table class="configureSourceTable">
+        <thead>
+            <th></th>
+            <th>Source Name</th>
+            <th>Generation Status</th>
+            <th>Generated</th>
+            <th>Generation Duration</th>
+            <th></th>
+        </thead>
+        <tbody data-bind="foreach:$component.evidenceSources">
+            <tr>
+                <td>
+                    <!-- ko ifnot: $component.isRunning -->
+                    <div class="btn btn-xs btn-success" data-bind="css: {'disabled':$component.dirtyFlag.isDirty()},click:$component.generate"><i class="fa fa-play"></i>Generate</div>
+                    <!-- /ko -->
+                    <div class="btn btn-xs btn-success" data-bind="visible:$component.isRunning"><i class="fa fa-spinner fa-spin"></i></div>                    
+                </td>
+                <td data-bind="text:sourceName"></td>
+                <td class="statusIndicator rightaligned">
+                    <span class="fa" data-bind="css: { 'fa-check-circle' : isValid, 'fa-exclamation-circle' : !isValid }"></span>&nbsp;<span data-bind="text: status"></span>
+                </td>
+                <td class="rightaligned">
+                    <div data-bind="text:startTime"></div>
+                </td>
+                <td class="rightaligned">
+                    <div data-bind="text:executionDuration"></div>
+                </td>
+                <td class="rightaligned">
+                    <!-- ko if: $data.isValid -->
+                    <button type="button" class="btn btn-sm btn-primary" data-bind="click:$component.loadResults">View Results</button>
+                    <!-- /ko -->
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+</div>
+<div data-bind="if: !$component.conceptSetValid()">
+    <i class="fa fa-exclamation-triangle"></i>Your saved concepts come from multiple Domains (Condition, Drug). The concept set must contain ONLY conditions OR drugs in order to evaluate the negative controls.
+</div>
+<div class="loading" data-bind="if:$component.loadingResults()">loading</div>
+<div data-bind="if: $component.negativeControls() && $component.negativeControls().length > 0 && $component.currentEvidenceService() && $component.currentResultSource() && $component.conceptSet() && !$component.loadingResults()">
+    <div class="paddedWrapper">
+        <b>Negative Controls for <u><span data-bind="text: $component.conceptSet().name()"></span></u> from <u><span data-bind="text: $component.currentEvidenceService().sourceName"></span></u></b>
+        <br>
+        View record counts for: <select data-bind="options: $component.resultSources, optionsText: 'sourceName', optionsValue: 'sourceKey', value: $component.currentResultSource().sourceKey"></select>
+    </div>
+    <hr />
+    <div class="paddedWrapper">
+<table class="conceptSetTable stripe compact hover" cellspacing="0" width="100%" data-bind="dataTable:{
+            data: $component.negativeControls(),
+            options: {
+                            dom: 'Blfiprt',
+                            language: {
+                                search : 'Filter Rows:'
+                            },
+                            buttons: [
+                                        'colvis','copyHtml5','excelHtml5','csvHtml5','pdfHtml5'
+                            ],
+							colVis: {
+								buttonText: 'Change Columns',
+								align: 'right',
+								overlayFade: 0,
+								showAll: 'Show All Columns',
+								restore: 'Reset Columns'
+							},
+							lengthMenu: [[25, 50, 100, -1], [25, 50, 100,'All']],
+							orderClasses: false,
+							deferRender: true,
+							autoWidth: false,
+                            order: [[17, 'asc'], [18, 'desc']],
+              columns: [
+                        {
+                            title: 'Id',
+                            data: 'conceptId'
+                        },
+                        {
+                            title: 'Name',
+                            data: 'conceptName',
+                            render: function (s, p, d) {
+                                var valid = true; //d.INVALID_REASON_CAPTION == 'Invalid' ? 'invalid' : '';
+                                return '<a class=' + valid + ' href=\'#/concept/' + d.conceptId + '\'>' + d.conceptName + '</a>';
+                            }
+                        },
+                        {
+                            title: 'Domain',
+                            data: 'domainId'
+                        },
+                        {
+                            title: 'Medline CT',
+                            data: 'medlineCt',
+                            render: $.fn.dataTable.render.number( ',','.', 0)
+                        },
+                        {
+                            title: 'Medline Case',
+                            data: 'medlineCase',
+                            render: $.fn.dataTable.render.number( ',','.', 0)
+                        },
+                        {
+                            title: 'Medline Other',
+                            data: 'medlineOther',
+                            render: $.fn.dataTable.render.number( ',','.', 0)
+                        },
+                        {
+                            title: 'SemMedDB CT (True)',
+                            data: 'semmeddbCtT',
+                            visible: false,
+                            render: $.fn.dataTable.render.number( ',','.', 0)
+                        },
+                        {
+                            title: 'SemMedDB Case (True)',
+                            data: 'semmeddbCaseT',
+                            visible: false,
+                            render: $.fn.dataTable.render.number( ',','.', 0)
+                        },
+                        {
+                            title: 'SemMedDB Other (True)',
+                            data: 'semmeddbOtherT',
+                            visible: false,
+                            render: $.fn.dataTable.render.number( ',','.', 0)
+                        },
+                        {
+                            title: 'SemMedDB CT (False)',
+                            data: 'semmeddbCtF',
+                            visible: false,
+                            render: $.fn.dataTable.render.number( ',','.', 0)
+                        },
+                        {
+                            title: 'SemMedDB Case (False)',
+                            data: 'semmeddbCaseF',
+                            visible: false,
+                            render: $.fn.dataTable.render.number( ',','.', 0)
+                        },
+                        {
+                            title: 'SemMedDB Other (False)',
+                            data: 'semmeddbOtherF',
+                            visible: false,
+                            render: $.fn.dataTable.render.number( ',','.', 0)
+                        },
+                        {
+                            title: 'EU SPC',
+                            data: 'euSPC',
+                            visible: false,
+                            render: $.fn.dataTable.render.number( ',','.', 0)
+                        },
+                        {
+                            title: 'EU SPC',
+                            data: 'euSPC',
+                            visible: false,
+                            render: $.fn.dataTable.render.number( ',','.', 0)
+                        },
+                        {
+                            title: 'Splicer ADR',
+                            data: 'splADR',
+                            render: $.fn.dataTable.render.number( ',','.', 0)
+                        },
+                        {
+                            title: 'AERS',
+                            data: 'aers',
+                            render: $.fn.dataTable.render.number( ',','.', 0)
+                        },
+                        {
+                            title: 'AERS PRR',
+                            data: 'aersPRR',
+                            render: $.fn.dataTable.render.number( ',','.', 4)
+                        },
+                        {
+                            title: 'Prediction',
+                            data: 'prediction',
+                            render: function (data) {
+                                return (Math.ceil(data * 1000) / 1000).toFixed(4);
+                            }
+                        },
+                        {
+                            title: 'RC',
+                            data: 'recordCount'
+                        },
+                        {
+                            title: 'DRC',
+                            data: 'descendantRecordCount'
+                        }
+                ]
+           }
+        }">
+			</table>
+    </div>
+</div>
