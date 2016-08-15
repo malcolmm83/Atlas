@@ -18,7 +18,7 @@
     <ul class="nav nav-tabs">
         <li role="presentation" data-bind="css: { active: $component.tabMode() == 'specification' }, click: function() { $component.tabMode('specification') };"><a>Specification</a>
         </li>
-        <li role="presentation" data-bind="visible: config.cohortComparsionResultsEnabled, css: { active: $component.tabMode() == 'results' }, click: function() { $component.tabMode('results') };"><a>Results</a>
+        <li role="presentation" data-bind="visible: false, css: { active: $component.tabMode() == 'results' }, click: function() { $component.tabMode('results') };"><a>Results</a>
         </li>
         <li role="presentation" data-bind="css: { active: $component.tabMode() == 'export' }, click: function() { $component.tabMode('export') };"><a>Export</a>
         </li>
